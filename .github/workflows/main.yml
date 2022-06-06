@@ -32,9 +32,14 @@ jobs:
       # Runs a set of commands using the runners shell
 
         # Log into Azure
+      - uses: actions/checkout@main
+
+        # Log into Azure
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
         # Deploy ARM template
       - name: Run ARM deploy
@@ -47,4 +52,3 @@ jobs:
 
         # output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}
-      
