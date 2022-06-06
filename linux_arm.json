@@ -44,7 +44,7 @@
     },
 	"virtualMachineRG": {
                     "type": "string",
-                    "defaultValue": "linuxvm1_group"
+                    "defaultValue": "arm_group"
                 }
   },
   "variables": {
