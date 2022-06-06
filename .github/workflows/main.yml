@@ -47,7 +47,7 @@ jobs:
         with:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
-          template: ./azuredeploy.json
+          template: ./arm_goldenimage.json
           parameters: storageAccountType=Standard_LRS
 
         # output containerName variable from template
