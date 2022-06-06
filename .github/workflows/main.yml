@@ -48,7 +48,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./arm_goldenimage.json
-          parameters: storageAccountType=Standard_LRS
+#           parameters: storageAccountType=Standard_LRS
 
         # output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}
