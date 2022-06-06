@@ -31,6 +31,7 @@
       "type": "String"
     },
     "adminPassword": {
+      "defaultValue": "Dell@123",
       "type": "SecureString"
     },
     "nicCount": {
