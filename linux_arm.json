@@ -1,0 +1,118 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+	   "location": {
+                    "type": "string",
+                    "defaultValue": "[resourceGroup().location]"
+                },
+    "subnetName": {
+      "defaultValue": "default",
+      "type": "String"
+    },
+    "virtualNetworkId": {
+      "defaultValue": "/subscriptions/dcb48c0f-fb4e-49f8-9356-503cc3933161/resourceGroups/linuxvm1_group/providers/Microsoft.Network/virtualNetworks/linuxvm1_group-vnet",
+      "type": "String"
+    },
+    "imageRefId": {
+      "defaultValue": "/subscriptions/dcb48c0f-fb4e-49f8-9356-503cc3933161/resourceGroups/linuxvm1_group/providers/Microsoft.Compute/galleries/Demo_Gallery/images/18.04-LTS",
+      "type": "String"
+    },
+    "virtualMachineName": {
+      "defaultValue": "armvm",
+      "type": "String"
+    },
+    "virtualMachineSize": {
+      "defaultValue": "Standard_E2bds_V5",
+      "type": "String"
+    },
+    "adminUsername": {
+      "defaultValue": "linuxadmin",
+      "type": "String"
+    },
+    "adminPassword": {
+      "type": "SecureString"
+    },
+    "nicCount": {
+      "defaultValue": 1,
+      "type": "Int"
+    },
+    "vmCount": {
+      "defaultValue": 1,
+      "type": "Int"
+    },
+	"virtualMachineRG": {
+                    "type": "string",
+                    "defaultValue": "linuxvm1_group"
+                }
+  },
+  "variables": {
+    "vnetId": "[parameters('virtualNetworkId')]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+    "networkInterfaceName": "nic"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2021-03-01",
+      "name": "[concat(variables('networkInterfaceName'),copyIndex())]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ]
+      },
+      "copy": {
+        "name": "nicCopy",
+        "count": "[parameters('nicCount')]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "[concat(parameters('virtualMachineName'),copyIndex())]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', concat(variables('networkInterfaceName'),copyIndex()))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('virtualMachineSize')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage"
+          },
+          "imageReference": {
+            "id": "[parameters('imageRefId')]"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName'),copyIndex()))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('virtualMachineName'),copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        }
+      },
+      "copy": {
+        "name": "vmCopy",
+        "count": "[parameters('vmCount')]"
+      }
+    }
+  ],
+  "outputs": {}
+}
