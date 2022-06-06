@@ -47,7 +47,7 @@ jobs:
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./createvm.json
 #           parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
-          parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
+          parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test adminPassword="Dell@123"
 
         # output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}
