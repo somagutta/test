@@ -71,7 +71,7 @@
     "vNetAddressPrefixes": "10.0.0.0/16",
     "vNetSubnetName": "default",
     "vNetSubnetAddressPrefix": "10.0.0.0/24",
-    "vmName": "[concat(parameters('projectName'), (parameters('os'), (parameters('serial'), (parameters('env'))]",
+    "vmName": "[concat(parameters('projectName'), parameters('os'), parameters('serial'), parameters('env'))]",
     "publicIPAddressName": "[concat(parameters('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(parameters('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(parameters('projectName'), '-nsg')]",
