@@ -8,19 +8,20 @@
       "templateHash": "8604128132609554997"
     }
   },
-  "projectName": {
-      "type": "string",
-      "defaultValue": "BHAZ",
-      "metadata": {
-        "description": "Specifies a name for generating resource names."
-      }
-   },
+  
   "parameters": {
     "adminUsername": {
       "type": "string",
       "defaultValue": "chinnabh",
       "metadata": {
         "description": "Username for the Virtual Machine."
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "defaultValue": "BHAZ",
+      "metadata": {
+        "description": "Specifies a name for generating resource names."
       }
     },
     "subnetName": {
