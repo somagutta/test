@@ -47,7 +47,7 @@ jobs:
           resourceGroupName: ${{ secrets.AZURE_RG_WIN }}
           template: ./windows-gi.json
 #           parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
-          parameters: projectName=BHAZ adminUsername=chinnaarm adminPublicKey=test adminPassword="pPgu75TYJxAKm2Zm"
+          parameters: projectName=BHAZ adminUsername=chinnaarm adminPassword="pPgu75TYJxAKm2Zm"
 
         # output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}
