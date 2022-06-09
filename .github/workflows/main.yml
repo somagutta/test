@@ -47,7 +47,7 @@ jobs:
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./updated_arm_lnx_gi.json
 #           parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
-          parameters: projectName=testabcd adminUsername=chinnaarm adminPublicKey=test adminPassword="Dell@123"
+          parameters: projectName=BHAZ adminUsername=chinnaarm adminPublicKey=test adminPassword="Dell@123"
 
         # output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}
