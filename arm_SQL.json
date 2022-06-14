@@ -4,7 +4,14 @@
     "parameters": {
     "configuration": {
       "type": "object",
-      "defaultValue": "test",
+      "defaultValue": {
+        "displayName": "Azure SQL Server (logical)",
+        "department": "IT",
+        "environment": "dev",
+        "primaryOwner": "test@example.com",
+        "secondaryOwner": "test@example.com",
+        "version": "1.0"
+      }
       "metadata": {
         "description": "Configuration for this resource"
       }
