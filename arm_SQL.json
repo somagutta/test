@@ -4,6 +4,7 @@
     "parameters": {
     "configuration": {
       "type": "object",
+      "defaultValue": "test",
       "metadata": {
         "description": "Configuration for this resource"
       }
