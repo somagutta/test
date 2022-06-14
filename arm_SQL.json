@@ -72,7 +72,6 @@
         "type": "Microsoft.Sql/servers",
         "location": "[resourceGroup().location]",
         "apiVersion": "2015-05-01-preview",
-        "dependsOn": [],
         "tags": {
           "displayname": "[parameters('configuration').displayName]",
           "department": "[parameters('configuration').department]",
@@ -105,7 +104,6 @@
             "type": "Microsoft.Sql/servers/databases",
             "location": "[resourceGroup().location]",
             "apiVersion": "2014-04-01-preview",
-            "dependsOn": [],
             "tags": {
               "displayname": "[parameters('configuration').displayName]",
               "department": "[parameters('configuration').department]",
