@@ -2,123 +2,299 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "yourservernameName": {
-      "type": "string",
-      "defaultValue": "yourservername2"
+    "administratorLogin": {
+      "type": "string"
     },
-    "yourservernameAdminLogin": {
-      "type": "string",
-      "defaultValue": "VeryWiseAdmin",
-      "minLength": 1
+    "sqlPassword": {
+      "type": "securestring"
     },
-    "yourservernameAdminLoginPassword": {
-      "type": "securestring",
-      "defaultValue": "ReplaceWithTheMostSecurePasswordThatEverExisted&NeverShareLikeThisWithAnyone!"
+    "collation": {
+      "type": "string"
     },
-    "dbnameName": {
-      "type": "string",
-      "defaultValue": "dbname",
-      "minLength": 1
+    "databaseName": {
+      "type": "string"
     },
-    "dbnameCollation": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    "tier": {
+      "type": "string"
     },
-    "dbnameEdition": {
-      "type": "string",
-      "defaultValue": "Basic"
+    "skuName": {
+      "type": "string"
     },
-    "dbnameRequestedServiceObjectiveName": {
+    "locationPrimary": {
+      "type": "string"
+    },
+    "locationSecondary": {
+      "type": "string"
+    },
+    "maxSizeBytes": {
+      "type": "int"
+    },
+    "serverNamePrimary": {
+      "type": "string"
+    },
+    "serverNameSecondary": {
+      "type": "string"
+    },
+    "zoneRedundant": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "licenseType": {
       "type": "string",
-      "defaultValue": "Basic"
+      "defaultValue": ""
+    },
+    "storageAccountNameprefix": {
+      "type": "string",
+      "defaultValue": "storagesqlaudit"
+    },
+    "storageType": {
+      "type": "string",
+      "defaultValue": "Standard_GRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "sqlAdminAadGroupId": {
+      "type": "securestring"
+    },
+    "sqlAdminAadGroup": {
+      "type": "string"
+    },
+    "aadTenantId": {
+      "type": "securestring"
     }
   },
   "variables": {
+    "storageAccountName": "[take(concat(parameters('storageAccountNameprefix'), uniqueString(resourceGroup().location)),24)]"
   },
   "resources": [
     {
-      "name": "[parameters('yourservernameName')]",
+      "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Sql/servers",
-      "location": "West Europe",
-      "apiVersion": "2014-04-01-preview",
-      "dependsOn": [],
-      "tags": {
-        "displayName": "yourservername"
-      },
+      "location": "[parameters('locationPrimary')]",
+      "name": "[parameters('serverNamePrimary')]",
       "properties": {
-        "administratorLogin": "[parameters('yourservernameAdminLogin')]",
-        "administratorLoginPassword": "[parameters('yourservernameAdminLoginPassword')]",
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlPassword')]" ,
         "version": "12.0"
       },
       "resources": [
         {
-          "name": "[concat(parameters('yourservernameName'),'/AllowAllWindowsAzureIps')]",
-          "type": "Microsoft.Sql/servers/firewallRules",
-          "location": "[resourceGroup().location]",
+          "apiVersion": "2017-10-01-preview",
+          "type": "Microsoft.Sql/servers/databases",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'))]"
+          ],
+          "location": "[parameters('locationPrimary')]",
+          "name": "[concat(parameters('serverNamePrimary'), '/', parameters('databaseName'))]",
+          "properties": {
+            "collation": "[parameters('collation')]",
+            "maxSizeBytes": "[parameters('maxSizeBytes')]",
+            "zoneRedundant": "[parameters('zoneRedundant')]",
+            "licenseType": "[parameters('licenseType')]"
+          },
+          "sku": {
+            "name": "[parameters('skuName')]",
+            "tier": "[parameters('tier')]"
+          },
+          "resources": [
+            {
+              "name": "default",
+              "type": "backupLongTermRetentionPolicies",
+              "dependsOn": [
+                "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'), '/', 'databases', '/', parameters('databaseName'))]"
+              ],
+              "apiVersion": "2017-03-01-preview",
+              "properties": {
+                "weeklyRetention": "P1W",
+                "monthlyRetention": "P4W",
+                "yearlyRetention": "P520W",
+                "weekOfYear": 1
+              }
+            }
+          ]
+        },
+        {
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('yourservernameName'))]"
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'))]"
+          ],
+          "location": "[parameters('locationPrimary')]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          },
+          "type": "firewallrules"
+        },
+        {
+          "apiVersion": "2015-05-01-preview",
+          "type": "auditingSettings",
+          "name": "Default",
+          "location": "[parameters('locationPrimary')]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'), '/databases/',parameters('databaseName'))]",
+            "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
           ],
           "properties": {
-            "startIpAddress": "0.0.0.0",
-            "endIpAddress": "0.0.0.0"
+            "State": "Enabled",
+            "storageEndpoint": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+            "retentionDays": 0,
+            "auditActionsAndGroups": [ "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP", "DATABASE_LOGOUT_GROUP", "USER_CHANGE_PASSWORD_GROUP" ],
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "isStorageSecondaryKeyInUse": false
           }
         },
         {
-          "name": "[concat(parameters('yourservernameName'),'/',parameters('dbnameName'))]",
-          "type": "Microsoft.Sql/servers/databases",
-          "location": "West Europe",
-          "apiVersion": "2014-04-01-preview",
+          "name": "ActiveDirectory",
+          "type": "administrators",
+          "apiVersion": "2014-04-01-Preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('yourservernameName'))]"
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'), '/databases/',parameters('databaseName'))]"
           ],
-          "tags": {
-            "displayName": "dbname"
-          },
+          "location": "[parameters('locationPrimary')]",
           "properties": {
-            "collation": "[parameters('dbnameCollation')]",
-            "edition": "[parameters('dbnameEdition')]",
-            "maxSizeBytes": "1073741824",
-            "requestedServiceObjectiveName": "[parameters('dbnameRequestedServiceObjectiveName')]"
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAdminAadGroup')]",
+            "sid": "[parameters('sqlAdminAadGroupId')]",
+            "tenantId": "[parameters('aadTenantId')]"
           }
         }
-      ]
+      ],
+      "tags": {
+        "application": "sql",
+        "owner": "david@davidobrienconsulting.com",
+        "environment": "dev",
+        "costcentre": "devops"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Sql/servers",
+      "location": "[parameters('locationSecondary')]",
+      "name": "[parameters('serverNameSecondary')]",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Sql/servers/databases",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'), '/databases/',parameters('databaseName'))]"
+          ],
+          "sku": {
+            "name": "[parameters('skuName')]",
+            "tier": "[parameters('tier')]"
+          },
+          "name": "[concat(parameters('serverNameSecondary'), '/', parameters('databaseName'))]",
+          "apiVersion": "2017-10-01-preview",
+          "location": "[parameters('locationSecondary')]",
+          "properties": {
+            "createMode": "OnlineSecondary",
+            "sourceDatabaseId": "[resourceId('Microsoft.Sql/servers/databases', parameters('serverNamePrimary'), parameters('databaseName'))]",
+            "zoneRedundant": "[parameters('zoneRedundant')]",
+            "licenseType": "[parameters('licenseType')]"
+          },
+          "resources": [
+            {
+              "name": "default",
+              "type": "backupLongTermRetentionPolicies",
+              "dependsOn": [
+                "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'), '/', 'databases', '/', parameters('databaseName'))]"
+              ],
+              "apiVersion": "2017-03-01-preview",
+              "properties": {
+                "weeklyRetention": "P1W",
+                "monthlyRetention": "P4W",
+                "yearlyRetention": "P520W",
+                "weekOfYear": 1
+              }
+            }
+          ]
+        },
+        {
+          "apiVersion": "2015-05-01-preview",
+          "type": "auditingSettings",
+          "name": "Default",
+          "location": "[parameters('locationSecondary')]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'), '/databases/',parameters('databaseName'))]",
+            "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
+          ],
+          "properties": {
+            "State": "Enabled",
+            "storageEndpoint": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net')]",
+            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+            "retentionDays": 0,
+            "auditActionsAndGroups": [ "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP", "DATABASE_LOGOUT_GROUP", "USER_CHANGE_PASSWORD_GROUP" ],
+            "storageAccountSubscriptionId": "[subscription().subscriptionId]",
+            "isStorageSecondaryKeyInUse": false
+          }
+        },
+        {
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'))]"
+          ],
+          "location": "[parameters('locationPrimary')]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          },
+          "type": "firewallrules"
+        },
+        {
+          "name": "ActiveDirectory",
+          "type": "administrators",
+          "apiVersion": "2014-04-01-Preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'), '/databases/',parameters('databaseName'))]"
+          ],
+          "location": "[parameters('locationPrimary')]",
+          "properties": {
+            "administratorType": "ActiveDirectory",
+            "login": "[parameters('sqlAdminAadGroup')]",
+            "sid": "[parameters('sqlAdminAadGroupId')]",
+            "tenantId": "[parameters('aadTenantId')]"
+          }
+        }
+      ],
+      "tags": {
+        "application": "sql",
+        "owner": "david@davidobrienconsulting.com",
+        "environment": "dev",
+        "costcentre": "devops"
+      }
+    },
+    {
+      "name": "[variables('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ "[concat('Microsoft.Sql/servers/', parameters('serverNamePrimary'))]", "[concat('Microsoft.Sql/servers/', parameters('serverNameSecondary'))]" ],
+      "properties": {
+        "accountType": "[parameters('storageType')]"
+      },
+      "tags": {
+        "application": "sql",
+        "owner": "david@davidobrienconsulting.com",
+        "environment": "dev",
+        "costcentre": "devops"
+      }
     }
   ],
-  "outputs": {
-    "SomeString": {
-      "type": "string",
-      "value": "What ever you want to put here"
-    },
-    "ServerNameParam": {
-      "type": "string",
-      "value": "[parameters('yourservernameName')]"
-    },
-    "ServerResourceID": {
-      "type": "string",
-      "value": "[resourceId('Microsoft.Sql/servers', parameters('yourservernameName'))]"
-    },
-    "ServerObject": {
-      "type": "object",
-      "value": "[reference(parameters('yourservernameName'))]"
-    },
-    "SqlServerURL": {
-      "type": "string",
-      "value": "[reference(parameters('yourservernameName')).fullyQualifiedDomainName]"
-    },
-    "DbResourceID": {
-      "type": "string",
-      "value": "[resourceId('Microsoft.Sql/servers/databases', parameters('yourservernameName'), parameters('dbnameName'))]"
-    },
-    "DbObject": {
-      "type": "object",
-      "value": "[reference(parameters('dbnameName'))]"
-    },
-    "DbAdoConnString": {
-      "type": "string",
-      "value": "[concat('Server=tcp:',reference(parameters('yourservernameName')).fullyQualifiedDomainName,',1433;Initial Catalog=',parameters('dbnameName'),';Persist Security Info=False;User ID=',reference(parameters('yourservernameName')).administratorLogin,';Password=',reference(parameters('yourservernameName')).administratorLoginPassword,';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
-    }
-  }
-
+  "outputs": {}
 }
