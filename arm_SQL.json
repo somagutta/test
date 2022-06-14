@@ -91,9 +91,6 @@
             "type": "firewallrules",
             "location": "[resourceGroup().location]",
             "apiVersion": "2014-04-01-preview",
-            "dependsOn": [
-              "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
-            ],
             "properties": {
               "startIpAddress": "0.0.0.0",
               "endIpAddress": "0.0.0.0"
