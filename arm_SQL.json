@@ -1,0 +1,124 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "yourservernameName": {
+      "type": "string",
+      "defaultValue": "yourservername2"
+    },
+    "yourservernameAdminLogin": {
+      "type": "string",
+      "defaultValue": "VeryWiseAdmin",
+      "minLength": 1
+    },
+    "yourservernameAdminLoginPassword": {
+      "type": "securestring",
+      "defaultValue": "ReplaceWithTheMostSecurePasswordThatEverExisted&NeverShareLikeThisWithAnyone!"
+    },
+    "dbnameName": {
+      "type": "string",
+      "defaultValue": "dbname",
+      "minLength": 1
+    },
+    "dbnameCollation": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "dbnameEdition": {
+      "type": "string",
+      "defaultValue": "Basic"
+    },
+    "dbnameRequestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "name": "[parameters('yourservernameName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "West Europe",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "yourservername"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('yourservernameAdminLogin')]",
+        "administratorLoginPassword": "[parameters('yourservernameAdminLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "[concat(parameters('yourservernameName'),'/AllowAllWindowsAzureIps')]",
+          "type": "Microsoft.Sql/servers/firewallRules",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', parameters('yourservernameName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "[concat(parameters('yourservernameName'),'/',parameters('dbnameName'))]",
+          "type": "Microsoft.Sql/servers/databases",
+          "location": "West Europe",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', parameters('yourservernameName'))]"
+          ],
+          "tags": {
+            "displayName": "dbname"
+          },
+          "properties": {
+            "collation": "[parameters('dbnameCollation')]",
+            "edition": "[parameters('dbnameEdition')]",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "[parameters('dbnameRequestedServiceObjectiveName')]"
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "SomeString": {
+      "type": "string",
+      "value": "What ever you want to put here"
+    },
+    "ServerNameParam": {
+      "type": "string",
+      "value": "[parameters('yourservernameName')]"
+    },
+    "ServerResourceID": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Sql/servers', parameters('yourservernameName'))]"
+    },
+    "ServerObject": {
+      "type": "object",
+      "value": "[reference(parameters('yourservernameName'))]"
+    },
+    "SqlServerURL": {
+      "type": "string",
+      "value": "[reference(parameters('yourservernameName')).fullyQualifiedDomainName]"
+    },
+    "DbResourceID": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Sql/servers/databases', parameters('yourservernameName'), parameters('dbnameName'))]"
+    },
+    "DbObject": {
+      "type": "object",
+      "value": "[reference(parameters('dbnameName'))]"
+    },
+    "DbAdoConnString": {
+      "type": "string",
+      "value": "[concat('Server=tcp:',reference(parameters('yourservernameName')).fullyQualifiedDomainName,',1433;Initial Catalog=',parameters('dbnameName'),';Persist Security Info=False;User ID=',reference(parameters('yourservernameName')).administratorLogin,';Password=',reference(parameters('yourservernameName')).administratorLoginPassword,';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+    }
+  }
+
+}
