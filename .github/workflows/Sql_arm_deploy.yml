@@ -46,6 +46,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_SQL }}
           resourceGroupName: ${{ secrets.AZURE_RG_SQL }}
           template: ./arm_SQL.json
+          parameters: ./parameters-sql.json
 #           parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
           #parameters: projectName=BHAZ adminUsername=chinnaarm adminPublicKey=test adminPassword="Dell@123"
 
