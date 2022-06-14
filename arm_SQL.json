@@ -18,7 +18,7 @@
     },
     "sqlServerName": {
       "type": "string",
-      "defaultValue": "sql01ezcdeus2"
+      "defaultValue": "testabcd1234"
     },
     "administratorLogin": {
       "type": "string",
@@ -30,7 +30,7 @@
     },
     "sqldbName": {
       "type": "string",
-      "defaultValue": "default",
+      "defaultValue": "mysql",
       "minLength": 1
     },
     "sqldbCollation": {
