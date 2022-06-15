@@ -2,6 +2,8 @@
 
 name: CI_SQL_ARM
 
+
+
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
@@ -37,14 +39,14 @@ jobs:
         # Log into Azure
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_SQL }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_CAP }}
 
         # Deploy ARM template
       - name: Run ARM deploy
         uses: azure/arm-deploy@v1
         with:
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_SQL }}
-          resourceGroupName: ${{ secrets.AZURE_RG_SQL }}
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_CAP }}
+          resourceGroupName: ${{ secrets.AZURE_RG_CAP }}
           template: ./arm_SQL.json
           parameters: ./parameters-sql.json
 #           parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
