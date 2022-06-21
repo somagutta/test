@@ -20,10 +20,6 @@
               "defaultValue": "default",
               "type": "String"
           },
-        "os": {
-              "defaultValue": "W",
-              "type": "String"
-          },
         "serial": {
               "defaultValue": "0000000",
               "type": "String"
@@ -73,7 +69,7 @@
               "description": "Allocation method for the Public IP used to access the Virtual Machine."
             }
           },
-          "publicIpSku": {
+        "publicIpSku": {
             "type": "string",
             "defaultValue": "Basic",
             "allowedValues": [
@@ -84,7 +80,7 @@
               "description": "SKU for the Public IP used to access the Virtual Machine."
             }
           },
-          "OSVersion": {
+        "OSVersion": {
             "type": "string",
             "defaultValue": "2019-datacenter-gensecond",
             "allowedValues": [
@@ -127,7 +123,7 @@
             "type": "int",
             "defaultValue": 4,
             "minValue": 2,
-            "maxValue": 398,
+            "maxValue": 100,
             "metadata": {
                 "description": "Number of VMs to deploy, limit 398 since there is an 800 resource limit for a single template deployment"
             }
@@ -332,7 +328,9 @@
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
                 },
                 "storageProfile": {
-                    "imageReference": "[variables('imageReference')[parameters('OS')]]",
+                    "imageReference": {
+                        "id": "[parameters('imageRefId')]"
+                    },
                     "osDisk": {
                         "createOption": "FromImage"
                     }
