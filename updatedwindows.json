@@ -25,7 +25,7 @@
               "type": "String"
           },
         "env": {
-              "defaultValue": "1P",
+              "defaultValue": "P",
               "type": "String"
           },
         "adminPassword": {
@@ -160,6 +160,8 @@
     "variables": {
         "virtualNetworkName": "VNET",
         "addressPrefix": "10.0.0.0/16",
+        "vnetId": "[parameters('virtualNetworkId')]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
         "subnet1Name": "Subnet-1",
         "subnet2Name": "Subnet-2",
         "subnet1Prefix": "10.0.0.0/24",
@@ -167,6 +169,7 @@
         "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),variables('subnet1Name'))]",
         "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),variables('subnet2Name'))]",
         "availabilitySetName": "AvSet",
+        "vmName": "[concat(parameters('projectName'), parameters('os'), parameters('serial'))]",
         "imageReference": {
             "Ubuntu": {
                 "publisher": "Canonical",
@@ -185,17 +188,6 @@
         "nsgOsPort": {
             "Ubuntu": "22",
             "Windows": "3389"
-        },
-        "linuxConfiguration": {
-            "disablePasswordAuthentication": true,
-            "ssh": {
-                "publicKeys": [
-                    {
-                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-                        "keyData": "[parameters('adminPasswordOrKey')]"
-                    }
-                ]
-            }
         }
     },
     "resources": [
@@ -241,41 +233,6 @@
             }
         },
         {
-            "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('virtualNetworkName')]",
-            "apiVersion": "2020-05-01",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-            ],
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[variables('subnet1Name')]",
-                        "properties": {
-                            "addressPrefix": "[variables('subnet1Prefix')]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
-                        }
-                    },                    {
-                        "name": "[variables('subnet2Name')]",
-                        "properties": {
-                            "addressPrefix": "[variables('subnet2Prefix')]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat('nic', copyindex())]",
             "apiVersion": "2020-05-01",
@@ -294,7 +251,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[if(equals(mod(copyIndex(), 2),0), variables('subnet1Ref'), variables('subnet2Ref'))]"
+                                "id": "[if(equals(mod(copyIndex(), 2),0), variables('subnetRef'), variables('subnetRef'))]"
                             }
                         }
                     }
@@ -322,7 +279,7 @@
                     "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat('vm', copyIndex())]",
+                    "computerName": "[concat(variable('vmName'), copyIndex()), parameters('env')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
