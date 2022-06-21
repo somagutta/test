@@ -37,7 +37,7 @@
             }
           },
         "virtualNetworkId": {
-              "defaultValue": "/subscriptions/a74239cc-d361-42d0-8b19-02689f54200d/resourceGroups/testarm/providers/Microsoft.Network/virtualNetworks/test",
+              "defaultValue": "/subscriptions/d8b20c06-0b3f-4c87-8e6f-2338518fc7c1/resourceGroups/testarm/providers/Microsoft.Network/virtualNetworks/test",
               "type": "String"
           },
         "imageRefId": {
@@ -281,9 +281,7 @@
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'))]"
                 },
                 "storageProfile": {
-                    "imageReference": {
-                        "id": "[parameters('imageRefId')]"
-                    },
+                    "imageReference": "[variables('imageReference')[parameters('OS')]]",
                     "osDisk": {
                         "createOption": "FromImage"
                     }
