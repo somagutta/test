@@ -240,9 +240,6 @@
                 "name": "nicLoop",
                 "count": "[parameters('numberOfInstances')]"
             },
-            "dependsOn": [
-                "[variables('virtualNetworkName')]"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
