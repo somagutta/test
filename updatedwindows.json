@@ -277,7 +277,7 @@
                 "osProfile": {
                     "computerName": "[concat(parameters('projectName'), parameters('os'), parameters('serial'), copyIndex(), parameters('env'))]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPasswordOrKey')]"
+                    "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
                     "imageReference": "[variables('imageReference')[parameters('OS')]]",
