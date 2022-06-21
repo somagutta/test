@@ -159,7 +159,7 @@
         }
     },
     "variables": {
-        "virtualNetworkName": "VNET",
+        "virtualNetworkName": "test",
         "addressPrefix": "10.0.0.0/16",
         "vnetId": "[parameters('virtualNetworkId')]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
