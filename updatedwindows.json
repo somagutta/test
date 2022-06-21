@@ -107,7 +107,8 @@
           },
           "location": {
             "type": "string",
-            "defaultValue": "[resourceGroup().location]",
+            "defaultValue": "eastasia"
+              
             "metadata": {
               "description": "Location for all resources."
             }
