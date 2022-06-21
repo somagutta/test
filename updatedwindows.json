@@ -280,7 +280,7 @@
                     "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat((variable('vmName'), copyIndex(), parameters('env'))]",
+                    "computerName": "[concat(parameters('projectName'), parameters('os'), parameters('serial'), copyIndex(), parameters('env'))",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
