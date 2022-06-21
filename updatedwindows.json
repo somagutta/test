@@ -31,7 +31,7 @@
         "adminPassword": {
             "type": "secureString",
             "minLength": 15,
-            "defaultValue": "Ch7-d&7ff8"ZXUTH",
+            "defaultValue": "Ch7-d&7ff8+$#ZXUTH",
             "metadata": {
               "description": "Password for the Virtual Machine."
             }
