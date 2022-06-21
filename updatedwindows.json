@@ -121,8 +121,8 @@
           },
         "numberOfInstances": {
             "type": "int",
-            "defaultValue": 4,
-            "minValue": 2,
+            "defaultValue": 1,
+            "minValue": 1,
             "maxValue": 100,
             "metadata": {
                 "description": "Number of VMs to deploy, limit 398 since there is an 800 resource limit for a single template deployment"
@@ -197,7 +197,7 @@
             "location": "[parameters('location')]",
             "copy":{
                 "name": "asLoop",
-                "count": 2
+                "count": 1
             },
             "properties": {
                 "platformFaultDomainCount": 2,
@@ -277,7 +277,7 @@
                 "osProfile": {
                     "computerName": "[concat(parameters('projectName'), parameters('os'), parameters('serial'), copyIndex(), parameters('env'))",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPasswordOrKey')]",
+                    "adminPassword": "[parameters('adminPasswordOrKey')]"
                 },
                 "storageProfile": {
                     "imageReference": "[variables('imageReference')[parameters('OS')]]",
