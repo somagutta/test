@@ -31,7 +31,7 @@
         "adminPassword": {
             "type": "secureString",
             "minLength": 12,
-            "defaultValue": "pPgu75TYJxAKm2Zm",
+            "defaultValue": "DellaBCD123aaa@123",
             "metadata": {
               "description": "Password for the Virtual Machine."
             }
