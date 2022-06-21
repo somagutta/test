@@ -247,7 +247,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[if(equals(mod(copyIndex(), 2),0), variables('subnetRef'), variables('subnetRef'))]"
+                                "id": "[variables('subnetRef')]"
                             }
                         }
                     }
