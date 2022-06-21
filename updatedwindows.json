@@ -167,8 +167,6 @@
         "subnet2Name": "Subnet-2",
         "subnet1Prefix": "10.0.0.0/24",
         "subnet2Prefix": "10.0.1.0/24",
-        "subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),variables('subnet1Name'))]",
-        "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),variables('subnet2Name'))]",
         "availabilitySetName": "AvSet",
         "vmName": "[concat(parameters('projectName'), parameters('os'), parameters('serial'))]",
         "imageReference": {
