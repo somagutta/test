@@ -31,7 +31,7 @@
         "adminPassword": {
             "type": "secureString",
             "minLength": 12,
-            "defaultValue": "test@1234567",
+            "defaultValue": "Test@1234567",
             "metadata": {
               "description": "Password for the Virtual Machine."
             }
