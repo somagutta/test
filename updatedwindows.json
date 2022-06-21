@@ -107,8 +107,7 @@
           },
           "location": {
             "type": "string",
-            "defaultValue": "eastasia"
-              
+            "defaultValue": "eastasia",
             "metadata": {
               "description": "Location for all resources."
             }
