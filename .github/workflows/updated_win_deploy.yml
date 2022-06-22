@@ -45,7 +45,7 @@ jobs:
         with:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_CAP }}
           resourceGroupName: ${{ secrets.AZURE_RG_CAP }}
-          template: ./updatedwindows.json
+          template: ./windows-gi-upadted-format.yml
 #          parameters: ./parameters-sql.json
 #           parameters: projectName=testarm adminUsername=chinnaarm adminPublicKey=test
           parameters: projectName=BHAZ adminUsername=chinnaarm
