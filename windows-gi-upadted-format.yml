@@ -16,7 +16,7 @@
                 },
                 "imageRefId": {
                     "type": "string",
-                    "defaultValue": "/subscriptions/d8b20c06-0b3f-4c87-8e6f-2338518fc7c1/resourceGroups/testarm/providers/Microsoft.Compute/galleries/test/images/abcvdefg"
+                    "defaultValue": "/subscriptions/d8b20c06-0b3f-4c87-8e6f-2338518fc7c1/resourceGroups/testarm/providers/Microsoft.Compute/galleries/test/images/abcvdefg/versions/0.0.1"
                 },
                 "virtualMachineName": {
                     "type": "string",
