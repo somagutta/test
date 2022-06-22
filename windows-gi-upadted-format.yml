@@ -39,7 +39,6 @@
                     "defaultValue":"bhadmin"
                 },
                 "adminPassword": {
-                    "defaultValue":"Welcome@123456",
                     "type": "secureString"
                 },
                 "availabilitySetName": {
