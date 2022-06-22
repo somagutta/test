@@ -20,7 +20,7 @@
                 },
                 "virtualMachineName": {
                     "type": "string",
-                    "defaultValue": "zzzbhazcicdtest101"
+                    "defaultValue": "bhazcicdtest101"
                 },
                 "virtualMachineRG": {
                     "type": "string",
